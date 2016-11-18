@@ -5,7 +5,8 @@ art_make_library( LIBRARY_NAME  ub_PMTAna
                   LIBRARIES
                              ${ROOT_BASIC_LIB_LIST}
                              lardataobj_RawData
-)
+                             lardata_Utilities
+                             )
 
 
 install_headers()

@@ -15,6 +15,7 @@
 #include "TTree.h"
 
 #include "lardataobj/RawData/OpDetWaveform.h"
+#include "lardata/DetectorInfo/DetectorClocks.h"
 
 namespace pmt{
   class PMTAna;
@@ -30,21 +31,23 @@ public:
   /// Default destructor
   virtual ~PMTAna(){};
 
-  void RunAnalysis(std::vector<raw::OpDetWaveform> const&);
+  void RunAnalysis(std::vector<raw::OpDetWaveform> const&, detinfo::DetectorClocks const&  detectorClocks);
   void SetupOutputTree(TTree*);
   
  private:
 
   std::string fAlgName;
   TTree*      fWaveformTree;
-  Double_t    waveform_start_time;
-  UInt_t      waveform_channel;
-  UInt_t      waveform_size;
-  Double_t    waveform_peak_time;
-  Short_t     waveform_peak_value;
-  
+  Double_t    _waveform_start_time;
+  UInt_t      _waveform_channel;
+  UInt_t      _waveform_size;
+  Double_t    _waveform_peak_time;
+  Short_t     _waveform_peak_value;
+  Double_t    _waveform_relative_time;
+  std::vector<short> _waveform;
+
   void PrintInfo();
-  void AnalyzeWaveform(raw::OpDetWaveform const&);
+  void AnalyzeWaveform(raw::OpDetWaveform const&, detinfo::DetectorClocks const&);
   
 };
 

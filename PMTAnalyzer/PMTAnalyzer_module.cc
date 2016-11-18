@@ -18,6 +18,7 @@
 #include "messagefacility/MessageLogger/MessageLogger.h"
 
 #include "art/Framework/Services/Optional/TFileService.h"
+#include "lardata/DetectorInfoServices/DetectorClocksService.h"
 
 #include "TTree.h"
 
@@ -44,7 +45,10 @@ public:
 private:
 
   // Declare member data here.
+//  PrintRelevantInfo();
   pmt::PMTAna fMyAnalysisObj;
+  TTree* _tree;
+  int _run, _subrun, _event;
 };
 
 
@@ -54,18 +58,38 @@ PMTAnalyzer::PMTAnalyzer(fhicl::ParameterSet const & p)
  // More initializers here.
 {
     art::ServiceHandle<art::TFileService> tfs;
-    fMyAnalysisObj.SetupOutputTree(tfs->make<TTree>("myanatree","MyAnalysis Tree"));
+    _tree = tfs->make<TTree>("myanatree","MyAnalysis Tree");
+    
+    fMyAnalysisObj.SetupOutputTree(_tree);
+
+    _tree->Branch("run",    &_run,    "run/I");
+    _tree->Branch("subrun", &_subrun, "subrun/I");
+    _tree->Branch("event",  &_event,  "event/I");
+
 }
 
 void PMTAnalyzer::analyze(art::Event const & e)
 {
-  // Implementation of required member function here.
+
+    _run    = e.id().run();
+    _subrun = e.id().subRun();
+    _event  = e.id().event();
+
     art::Handle<std::vector<raw::OpDetWaveform> > waveformHandle;
-    e.getByLabel("pmtreadout","OpdetBeamHighGain",waveformHandle);
-    if(!waveformHandle.isValid()) throw std::exception();
+    e.getByLabel("pmtreadout","OpdetCosmicHighGain",waveformHandle);
+    if(!waveformHandle.isValid()) {
+        std::cerr << "ERROR: can't find waveform from " << "?" << std::endl;
+        throw std::exception();
+    }
     std::vector<raw::OpDetWaveform> const& waveformVector(*waveformHandle);
 
-    fMyAnalysisObj.RunAnalysis(waveformVector);
+    // Get the detector clock service
+    auto const& detectorClocks (*lar::providerFrom< detinfo::DetectorClocksService >());
+    std::cout << "Trigger Time: " << detectorClocks.TriggerTime() << std::endl;
+    std::cout << "Tick Period:  " << detectorClocks.OpticalClock().TickPeriod() << std::endl;
+
+    fMyAnalysisObj.RunAnalysis(waveformVector, detectorClocks);
 }
+
 
 DEFINE_ART_MODULE(PMTAnalyzer)
