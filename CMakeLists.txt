@@ -1,8 +1,8 @@
 # ======================================================================
-#  ubuseranalysis main build file
+#  pmtana main build file
 #
 #  cd .../path/to/build/directory
-#  source .../path/to/ubuseranalysis/ups/setup_for_development <-d|-p>
+#  source .../path/to/pmtana/ups/setup_for_development <-d|-p>
 #  cmake [-DCMAKE_INSTALL_PREFIX=/install/path]
 #        -DCMAKE_BUILD_TYPE=$CETPKG_TYPE
 #        $CETPKG_SOURCE
@@ -16,7 +16,7 @@
 # use cmake 2.8 or later
 cmake_minimum_required (VERSION 2.8)
 
-project(ubuseranalysis)
+project(pmtana)
 
 # cetbuildtools contains our cmake modules
 SET ( CETBUILDTOOLS_VERSION $ENV{CETBUILDTOOLS_VERSION} )
@@ -51,8 +51,8 @@ include(ArtMake)
 include(BuildPlugins)
 
 # ADD SOURCE CODE SUBDIRECTORIES HERE
-add_subdirectory(UserAnalysis)
-add_subdirectory(UserAnalyzer)
+add_subdirectory(PMTAna)
+add_subdirectory(PMTAnalyzer)
 
 # tests
 add_subdirectory(test)

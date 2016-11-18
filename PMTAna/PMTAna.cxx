@@ -1,27 +1,27 @@
 #ifndef TEST_USERANALYSIS_CXX
 #define TEST_USERANALYSIS_CXX
 
-#include "UserAnalysis.hh"
+#include "PMTAna.hh"
 #include <iostream>
 
-test::UserAnalysis::UserAnalysis()
-  : fAlgName("UserAnalysis")
+pmt::PMTAna::PMTAna()
+  : fAlgName("PMTAna")
 {}
 
-void test::UserAnalysis::SetupOutputTree(TTree* tfs_tree){
+void pmt::PMTAna::SetupOutputTree(TTree* tfs_tree){
   fTree = tfs_tree;
 
   std::string title = fAlgName + " Tree";
   fTree->SetObject(fTree->GetName(),title.c_str());
 }
 
-void test::UserAnalysis::RunAnalysis(){
+void pmt::PMTAna::RunAnalysis(){
   PrintInfo();
 }
 
-void test::UserAnalysis::PrintInfo(){
-  std::cout << "\n================================== UserAnalysis ==========================" << std::endl;
-  std::cout << "This is a ub_UserAnalysis class called " << fAlgName << std::endl;
+void pmt::PMTAna::PrintInfo(){
+  std::cout << "\n================================== PMTAna ==========================" << std::endl;
+  std::cout << "This is a ub_PMTAna class called " << fAlgName << std::endl;
   std::cout << "\tThere is an output tree called "
 	    << fTree->GetName() << " (" << fTree->GetTitle() << ")" << std::endl;
   std::cout << "==========================================================================\n" << std::endl;

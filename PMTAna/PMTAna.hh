@@ -1,5 +1,5 @@
 /**
- * \file UserAnalysis.h
+ * \file PMTAna.h
  *
  * 
  * \brief Little sample program for establishing a user analysis space.
@@ -14,19 +14,19 @@
 
 #include "TTree.h"
 
-namespace test{
-  class UserAnalysis;
+namespace pmt{
+  class PMTAna;
 }
 
-class test::UserAnalysis{
+class pmt::PMTAna{
   
 public:
   
   /// Default constructor
-  UserAnalysis();
+  PMTAna();
 
   /// Default destructor
-  virtual ~UserAnalysis(){};
+  virtual ~PMTAna(){};
 
   void RunAnalysis();
   void SetupOutputTree(TTree*);
