@@ -16,6 +16,7 @@ void pmt::PMTAna::SetupOutputTree(TTree* tfs_tree){
 
   fWaveformTree->Branch("waveform_start_time",&_waveform_start_time,"waveform_start_time/D");
   fWaveformTree->Branch("waveform_channel",&_waveform_channel,"waveform_channel/i");
+  fWaveformTree->Branch("waveform_opdet",&_waveform_opdet,"waveform_opdet/i");
   fWaveformTree->Branch("waveform_size",&_waveform_size,"waveform_size/i");
   fWaveformTree->Branch("waveform_peak_time",&_waveform_peak_time,"waveform_peak_time/D");
   fWaveformTree->Branch("waveform_peak_value",&_waveform_peak_value,"waveform_peak_value/S");
@@ -23,15 +24,15 @@ void pmt::PMTAna::SetupOutputTree(TTree* tfs_tree){
   fWaveformTree->Branch("waveform","std::vector<short>",&_waveform);
 }
 
-void pmt::PMTAna::RunAnalysis(std::vector<raw::OpDetWaveform> const& waveform_vec, detinfo::DetectorClocks const&  detectorClocks){
+void pmt::PMTAna::RunAnalysis(std::vector<raw::OpDetWaveform> const& waveform_vec, detinfo::DetectorClocks const&  detectorClocks, geo::GeometryCore const& geometry){
   PrintInfo();
 
   for( auto const& waveform : waveform_vec)
-    AnalyzeWaveform(waveform, detectorClocks);
+    AnalyzeWaveform(waveform, detectorClocks, geometry);
 
 }
 
-void pmt::PMTAna::AnalyzeWaveform(raw::OpDetWaveform const& waveform, detinfo::DetectorClocks const&  detectorClocks){
+void pmt::PMTAna::AnalyzeWaveform(raw::OpDetWaveform const& waveform, detinfo::DetectorClocks const&  detectorClocks, geo::GeometryCore const& geometry){
 
   _waveform_peak_time = 0;
   _waveform_peak_value = -999;
@@ -44,20 +45,25 @@ void pmt::PMTAna::AnalyzeWaveform(raw::OpDetWaveform const& waveform, detinfo::D
   }
   _waveform_size = waveform.size();
   _waveform_start_time = waveform.TimeStamp();
+
+  
+  // Get the channel and the PMT ID
+  _waveform_opdet = 9999;
   _waveform_channel = waveform.ChannelNumber();
+  if (!geometry.IsValidOpChannel(_waveform_channel)) {
+    std::cerr << "Warning! Unrecognized channel number "  << _waveform_channel << ". Ignoring pulse" << std::endl;
+  } else
+    _waveform_opdet = geometry.OpDetFromOpChannel(_waveform_channel); 
 
-  //std::vector<short> & temp = waveform.Waveform();
+  // The whole waveform
   _waveform = waveform;
-
 
 
   // Reconstruct time
   double absTime = waveform.TimeStamp() 
                    + _waveform_peak_time * detectorClocks.OpticalClock().TickPeriod();
 
-  double relTime = absTime - detectorClocks.TriggerTime();
-
-  _waveform_relative_time = relTime;
+  _waveform_relative_time = absTime - detectorClocks.TriggerTime();
 
 
   fWaveformTree->Fill();                  

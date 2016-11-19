@@ -19,6 +19,7 @@
 
 #include "art/Framework/Services/Optional/TFileService.h"
 #include "lardata/DetectorInfoServices/DetectorClocksService.h"
+#include "larcore/Geometry/Geometry.h"
 
 #include "TTree.h"
 
@@ -88,7 +89,12 @@ void PMTAnalyzer::analyze(art::Event const & e)
     std::cout << "Trigger Time: " << detectorClocks.TriggerTime() << std::endl;
     std::cout << "Tick Period:  " << detectorClocks.OpticalClock().TickPeriod() << std::endl;
 
-    fMyAnalysisObj.RunAnalysis(waveformVector, detectorClocks);
+    // Get the geometry services
+    auto const& geometry(*lar::providerFrom< geo::Geometry >());
+    //fMaxOpChannel = geometry.MaxOpChannel();
+
+
+    fMyAnalysisObj.RunAnalysis(waveformVector, detectorClocks, geometry);
 }
 
 
