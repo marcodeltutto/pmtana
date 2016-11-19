@@ -82,7 +82,7 @@ add_subdirectory(test)
 #add_subdirectory(releaseDB)
 
 # ups - table and config files
-#add_subdirectory(ups)
+add_subdirectory(ups)
 
 # packaging utility
 include(UseCPack)
