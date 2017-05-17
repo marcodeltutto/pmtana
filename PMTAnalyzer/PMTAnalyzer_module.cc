@@ -47,7 +47,12 @@ private:
 
   // Declare member data here.
 //  PrintRelevantInfo();
+
+  std::string _waveform_label;
+  std::string _waveform_instance;
+
   pmt::PMTAna fMyAnalysisObj;
+
   TTree* _tree;
   int _run, _subrun, _event;
 };
@@ -58,6 +63,9 @@ PMTAnalyzer::PMTAnalyzer(fhicl::ParameterSet const & p)
   EDAnalyzer(p)  // ,
  // More initializers here.
 {
+    _waveform_label    = p.get<std::string>("WaveformLabel", "pmtreadout");
+    _waveform_instance = p.get<std::string>("WaveformInstance", "OpdetCosmicHighGain");
+
     art::ServiceHandle<art::TFileService> tfs;
     _tree = tfs->make<TTree>("myanatree","MyAnalysis Tree");
     
@@ -76,8 +84,9 @@ void PMTAnalyzer::analyze(art::Event const & e)
     _subrun = e.id().subRun();
     _event  = e.id().event();
 
+    std::cout << "Getting waveforms from " << _waveform_label << " " << _waveform_instance << std::endl;
     art::Handle<std::vector<raw::OpDetWaveform> > waveformHandle;
-    e.getByLabel("pmtreadout","OpdetCosmicHighGain",waveformHandle);
+    e.getByLabel(_waveform_label,_waveform_instance,waveformHandle);
     if(!waveformHandle.isValid()) {
         std::cerr << "ERROR: can't find waveform from " << "?" << std::endl;
         throw std::exception();
